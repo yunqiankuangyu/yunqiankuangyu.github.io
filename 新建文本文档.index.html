@@ -1,0 +1,814 @@
+
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>在线AI画图</title>
+    <meta name="description" content="在线NovelAI画图，免费AI画图，文生图，通过文字绘制图片，图片无损放大">
+    <meta name="keywords" content="在线AI画图,AI画图,novelai,naifu,在线AI绘画网站,二次元AI画图,文生图,通过文字绘制图片,图片无损放大">
+    <meta name="author" content="马牛逼">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="/component/pear/css/pear.min.css" />
+    <link id="layuicss-layer" rel="stylesheet" href="/component/layui/css/modules/layer/default/layer.css?v=3.5.1"
+        media="all">
+    <style>
+        .history-div {
+            border: 1px solid yellow;
+            border-radius: 5px;
+            background-color: none;
+            height: 100px;
+            position: relative;
+        }
+
+        .history-div span {
+            position: absolute;
+            bottom: 0px;
+            right: 0px;
+            padding: 3px;
+            background: rgba(255, 255, 255, 0.5);
+        }
+
+        .history-div a {
+            position: absolute;
+            top: 0px;
+            right: 0px;
+            background: rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+        }
+
+        .history-div img {
+            object-fit: contain;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        .layui-layer-imgbar {
+            min-height: 40px;
+            max-height: 200px;
+            line-height: 20px;
+            height: auto;
+            white-space: pre-line;
+            padding: 5px 0;
+        }
+
+        .layui-layer-imgtit a {
+            white-space: pre-line;
+        }
+    </style>
+</head>
+
+<body style="background: url(https://api.vvhan.com/api/acgimg) no-repeat; background-size: cover;">
+    <div class="layui-row layui-col-space10" style="margin: 10px;">
+        <div class="layui-col-md9">
+            <div class="layui-card">
+                <div class="layui-card-header">AI画图（NovelAI） power by 马牛逼</div>
+                <div class="layui-card-body">
+                    <blockquote class="layui-elem-quote">
+                        <div class="layui-btn-container">
+                            <a class="layui-btn layui-btn-danger layui-btn-sm" href="https://fk.8zyw.club/"
+                                target="_blank"><i class="layui-icon layui-icon-diamond"></i> 点我购买点数</a>
+                            <button class="layui-btn layui-btn-normal layui-btn-sm" id="notice">疑难解答</button>
+                            <a target="_blank" href="https://jq.qq.com/?_wv=1027&k=zhDzYmZv"
+                                class="layui-btn layui-btn-warm layui-btn-sm">
+                                <i class="layui-icon layui-icon-login-qq"></i> 485131985</a><br>
+                            <a class="layui-btn layui-btn-sm layui-btn-normal" href="/tag.html"
+                                target="_blank">标签选择器</a>
+                        </div>
+
+                        <a class="layui-font-red layui-show-xs-block"
+                            href="https://fanqiev2.work/auth/register?code=xj5Y"
+                            target="_blank"><b>▶机场推荐：番茄.V2航线◀</b></a>
+                    </blockquote>
+                    <div class="layui-tab">
+                        <ul class="layui-tab-title">
+                            <li class="layui-this" lay-id="genpic">图片生成</li>
+                            <li lay-id="config">界面设置</li>
+                            <li lay-id="tac_config">自动填充设置</li>
+                        </ul>
+                        <div class="layui-tab-content">
+                            <div class="layui-tab-item layui-show">
+
+                                <div class="layui-form" lay-filter="myform">
+                                    <div class="layui-form-item layui-form-text">
+                                        <label class="layui-form-label">图片描述</label>
+                                        <div
+                                            style="position: absolute;margin-top: 50px;margin-left: 30px;float: right;">
+                                            <button id="translate"
+                                                class="pear-btn pear-btn-primary pear-btn-xs">翻译到英语</button>
+                                        </div>
+                                        <div style="display: flex;flex-flow: row nowrap;">
+                                            <div class="layui-inline" style="flex: 100 100 0%;">
+                                                <div class="layui-input-block" style="margin-left:0px;">
+                                                    <textarea name="desc" placeholder="只能使用英语 最多225个标签 使用,分隔"
+                                                        lay-verify="required"
+                                                        class="layui-textarea">masterpiece,best quality,official art,extremely detailed CG unity 8k wallpaper, </textarea>
+                                                </div>
+                                            </div>
+                                            <div align="center" class="layui-inline"
+                                                style="margin-top: 1vw;margin-left:10px;">
+                                                <div>
+                                                    <button class="pear-btn pear-btn-primary pear-btn-sm" lay-submit
+                                                        lay-filter="generate">提交</button>
+                                                    <button type="reset"
+                                                        class="pear-btn pear-btn-danger pear-btn-xs">清空</button>
+                                                </div>
+                                                <div style="margin-top:10px;">
+                                                    <button id="defaulttag"
+                                                        class="pear-btn pear-btn-warming pear-btn-xs">默认</button>
+                                                    <button id="savetag"
+                                                        class="pear-btn pear-btn-primary pear-btn-xs">保存</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="layui-form-item layui-form-text">
+                                        <label class="layui-form-label">排除标签</label>
+                                        <div class="layui-input-block">
+                                            <textarea name="uc" placeholder="填写你想要排除的标签 使用,分隔"
+                                                class="layui-textarea"></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="layui-form-item">
+                                        <label class="layui-form-label">排除标签预设</label>
+                                        <div class="layui-input-block">
+                                            <select name="exclude">
+                                                <option value="nsfw">NSFW+低质量图片和奇怪的肢体</option>
+                                                <option value="lowanderr">排除低质量图片和奇怪的肢体</option>
+                                                <option value="low">排除低质量图片</option>
+                                                <option value="none">不排除</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="layui-form-item">
+                                        <label class="layui-form-label">分辨率</label>
+                                        <div class="layui-input-block">
+                                            <select name="resolution" lay-verify="required" lay-filter="resolution">
+                                                <option value="" disabled>请选择一个分辨率</option>
+                                                <optgroup label="中等大小">
+                                                    <option value="NORMALPortrait" selected>竖向(512x768)</option>
+                                                    <option value="NORMALLandscape">横向(768x512)</option>
+                                                    <option value="NORMALSquare">正方形(640x640)</option>
+                                                </optgroup>
+                                                <optgroup label="小尺寸">
+                                                    <option value="SMALLPortrait">竖向(384x640)</option>
+                                                    <option value="SMALLLandscape">横向(640x384)</option>
+                                                    <option value="SMALLSquare">正方形(512x512)</option>
+                                                </optgroup>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="layui-form-item">
+                                        <label class="layui-form-label">模型</label>
+                                        <div class="layui-input-block">
+                                            <select name="model" disabled>
+                                                <option value="nai-diffusion">NAI 扩散动漫 (Full)</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="layui-form-item">
+                                        <label class="layui-form-label">采样器</label>
+                                        <div class="layui-input-block">
+                                            <select name="sampler" lay-verify="required" lay-filter="sampler">
+                                                <option value="k_euler_ancestral" selected>k_euler_ancestral</option>
+                                                <option value="k_euler">k_euler</option>
+                                                <option value="k_lms">k_lms</option>
+                                                <option value="plms">plms</option>
+                                                <option value="ddim">ddim</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="layui-form-item">
+                                        <label class="layui-form-label">迭代次数</label>
+                                        <div class="layui-input-block">
+                                            <input type="number" max="28" name="steps" placeholder="(1~50) (28以上付费)"
+                                                autocomplete="off" class="layui-input" lay-verify="required" value="28">
+                                        </div>
+                                    </div>
+                                    <div class="layui-form-item">
+                                        <label class="layui-form-label">跟随度</label>
+                                        <div class="layui-input-block">
+                                            <input type="number" min="1.1" max="100" step="0.1" name="scale"
+                                                placeholder="(1.1~100) " autocomplete="off" class="layui-input"
+                                                lay-verify="required" value="11">
+                                        </div>
+                                    </div>
+                                    <div class="layui-form-item">
+                                        <label class="layui-form-label">添加高质量标签</label>
+                                        <div class="layui-input-block">
+                                            <input type="checkbox" name="qualityToggle" lay-skin="switch" checked>
+                                        </div>
+                                    </div>
+                                    <div class="layui-form-item">
+                                        <label class="layui-form-label">种子</label>
+                                        <div class="layui-input-block">
+                                            <input type="text" name="seed" placeholder="请输入您的图像种子 默认随机"
+                                                autocomplete="off" class="layui-input">
+                                        </div>
+                                    </div>
+                                    <div class="layui-form-item">
+                                        <label class="layui-form-label"><b>分享给别人查看</b></label>
+                                        <div class="layui-input-block">
+                                            <input type="checkbox" name="share" lay-skin="switch" checked>
+                                        </div>
+                                    </div>
+                                    <div class="layui-form-item">
+                                        <div id="embed-captcha"></div>
+                                        <p id="wait">正在加载验证码......</p>
+                                    </div>
+                                    <div class="layui-form-item">
+                                        <div class="layui-input-block">
+                                            <button class="pear-btn pear-btn-primary" lay-submit
+                                                lay-filter="generate">立即提交</button>
+                                            <button type="reset" plain class="pear-btn pear-btn-warming">重置</button>
+                                        </div>
+                                    </div>
+                                    <div class="layui-form-item">
+                                        <div class="layui-input-block">
+                                            <button class="pear-btn pear-btn-danger" id="clear">清空已生成缓存</button>
+                                            <button class="pear-btn pear-btn-success" id="getlist">从服务器获取已生成</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="layui-tab-item">
+                                <div class="layui-form" lay-filter="config">
+                                    <div class="layui-form-item">
+                                        <label class="layui-form-label">音乐开关</label>
+                                        <div class="layui-input-block">
+                                            <input type="checkbox" id="musicopt" lay-filter="music" lay-skin="switch"
+                                                checked>
+                                        </div>
+                                    </div>
+                                    <div class="layui-form-item">
+                                        <label class="layui-form-label">客服开关</label>
+                                        <div class="layui-input-block">
+                                            <input type="checkbox" id="kefuopt" lay-filter="kefu" lay-skin="switch"
+                                                checked>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="layui-tab-item">
+                                <blockquote class="layui-elem-quote">
+                                    如果显示所有结果，将忽略最多显示结果并在可滚动列表中显示所有结果。<br>
+                                    警告：对于长列表，您的浏览器可能会滞后。<br>
+                                    频率：指定在触发自动完成之前要等待多少毫秒。有助于防止打字时过于频繁的更新。
+                                </blockquote>
+                                <div class="layui-form" lay-filter="tac_config">
+                                    <div class="layui-form-item">
+                                        <label class="layui-form-label">总开关</label>
+                                        <div class="layui-input-block">
+                                            <input type="checkbox" name="tac_active" lay-skin="switch" checked>
+                                        </div>
+                                    </div>
+                                    <div class="layui-form-item">
+                                        <label class="layui-form-label">暗色主题</label>
+                                        <div class="layui-input-inline">
+                                            <input type="checkbox" name="tac_theme" lay-skin="switch">
+                                        </div>
+                                    </div>
+                                    <div class="layui-form-item">
+                                        <label class="layui-form-label">最多显示结果</label>
+                                        <div class="layui-input-inline">
+                                            <input type="number" name="tac_maxResults" required lay-verify="required"
+                                                placeholder="最多显示多少个结果" autocomplete="off" class="layui-input"
+                                                value="5">
+                                        </div>
+                                    </div>
+                                    <div class="layui-form-item">
+                                        <label class="layui-form-label">显示所有结果</label>
+                                        <div class="layui-input-inline">
+                                            <input type="checkbox" name="tac_showAllResults" lay-skin="switch">
+                                        </div>
+                                    </div>
+                                    <div class="layui-form-item">
+                                        <label class="layui-form-label">频率 毫秒</label>
+                                        <div class="layui-input-inline">
+                                            <input type="number" name="tac_delayTime" required lay-verify="required"
+                                                placeholder="指定在触发自动完成之前要等待多少毫秒" autocomplete="off" class="layui-input"
+                                                value="100">
+                                        </div>
+                                    </div>
+                                    <div class="layui-form-item">
+                                        <div class="layui-input-block">
+                                            <button class="pear-btn pear-btn-primary" lay-submit
+                                                lay-filter="tac">保存设置</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div><br>
+                </div>
+            </div>
+        </div>
+        <div class="layui-col-md3">
+            <div class="layui-card">
+                <div class="layui-card-header">已生成的图片</div>
+                <div class="layui-card-body" align="center">
+                    <div id="history" class="layui-row layui-col-space10"></div>
+                </div>
+            </div>
+            <div class="layui-panel">
+                <p class="layui-font-red" style="margin: 10px;">使用即表示您已阅读并同意<a href="/tos.html">用户协议</a></p>
+            </div>
+        </div>
+    </div>
+    <div class="layui-row layui-col-space15" style="margin: 10px;">
+        <div class="layui-col-md9">
+            <div class="layui-panel">
+                <script id="LA-DATA-WIDGET" crossorigin="anonymous" charset="UTF-8"
+                    src="https://v6-widget.51.la/v6/JrpB1buRIBfYJWxk/quote.js?theme=#2D8CF0,#333333,#999999,#333333,#FFFFFF,#2D8CF0,12&f=12&display=0,1,1,1,1,1,1,1"></script>
+            </div>
+        </div>
+    </div>
+
+    <script src="/component/layui/layui.js"></script>
+    <script src="/component/pear/pear.js"></script>
+    <script src="/component/js/gt.js"></script>
+    <script>
+        layui.use(['form', 'button', 'layer', 'popup', 'loading'], function () {
+            var $ = layui.jquery,
+                form = layui.form,
+                button = layui.button,
+                layer = layui.layer,
+                popup = layui.popup,
+                loading = layui.loading;
+
+            window.$ = layui.jquery;
+
+
+            if (localStorage.getItem("tag1") != null) $('[name="desc"]').val(localStorage.getItem("tag1"));
+
+            function renderrecord(records) {
+                if (records.length === 0) {
+                    $('#history').html('暂无数据')
+                    return
+                } else {
+                    $('#history').html('')
+                }
+                for (let i = 0; i < records.length; i++) {
+                    var item = records[i];
+                    $('#history').prepend('<div class="layui-col-xs6 layui-col-sm4 layui-col-md6"><div class=" history-div"><img src="' + item.url + '" layer-src="' + item.url + '" alt="' + item.tag + '"><span>种子 ' + item.seed + '</span><a href="' + item.url + '" target="_blank" class="pear-btn pear-btn-xs" download><i class="icon pear-icon pear-icon-download"></i></a></div></div>');
+                }
+            }
+
+            //读取历史记录
+            function isJSON(str) {
+                if (typeof str == 'string') {
+                    try {
+                        var obj = JSON.parse(str);
+                        if (typeof obj == 'object' && obj) {
+                            return true;
+                        } else {
+                            return false;
+                        }
+                    } catch (e) {
+                        console.log('error：' + str + '!!!' + e);
+                        return false;
+                    }
+                }
+                return false;
+            }
+
+
+            function isChina(s) {
+                var patrn = /[\u4E00-\u9FA5]|[\uFE30-\uFFA0]/gi;
+                if (!patrn.exec(s)) {
+                    return false;
+                } else {
+                    return true;
+                }
+            }
+
+            $.ajax({
+                url: "./ajax.php?act=geetest&t=" + (new Date()).getTime(),
+                type: "get",
+                dataType: "json",
+                success: function (data) {
+                    initGeetest({
+                        gt: data.gt,
+                        challenge: data.challenge,
+                        new_captcha: data.new_captcha,
+                        offline: !data.success,
+                        product: "popup",
+                        width: '100%',
+                        lang: 'zh-cn',
+                        protocol: 'https://'
+                    }, function (obj) {
+                        obj.appendTo("#embed-captcha");
+                        obj.onReady(function () {
+                            $("#wait").addClass("layui-hide");
+                        });
+                        window.gtobj = obj;
+                    });
+                }
+            });
+
+            var translate = function () {
+                desc = $('[name="desc"]').val();
+                if (isChina(desc) && desc != '') {
+                    var load = button.load({ elem: '#translate' });
+                    $.ajax({
+                        type: "POST",
+                        url: "./ajax.php?act=translate",
+                        crossDomain: true,
+                        timeout: "20000",
+                        data: { content: desc },
+                        success: function (res) {
+                            load.stop();
+                            if (res.code == 200) {
+                                $('[name="desc"]').val(res.data);
+                            } else {
+                                popup.failure(res.msg);
+                            }
+                        },
+                        error: function (XMLResponse) {
+                            load.stop();
+                            popup.failure('提交过程中遇到错误：' + XMLResponse.responseText);
+
+                            loading.loadRemove(1000);
+                        }
+                    });
+                }
+            }
+            $('#translate').click(translate);
+            $('[name="desc"]').change(translate);
+
+            form.on('submit(generate)', function (data) {
+                if (isChina(data.field.desc) || isChina(data.field.uc)) {
+                    popup.failure("不支持中文标签！请使用翻译功能翻译成英语");
+                    return false;
+                }
+                /// 验证
+                switch (data.field.exclude) {
+                    case 'all':
+                        data.field.uc = 'nsfw, lowres, bad anatomy, bad hands, text, error, missing fingers, extra digit, fewer digits, cropped, worst quality, low quality, normal quality, jpeg artifacts, signature, watermark, username,ugly,duplicate,morbid,mutilated,tranny,trans,trannsexual,mutation,deformed,long neck,bad anatomy,bad proportions,extra Cleavage, arms,extra legs, disfigured,more than 2 nipples,malformed,mutated,hermaphrodite,out of frame,extra limbs,missing arms,missing legs,poorly drawn hands,poorty drawn face,mutation,poorly drawn,long body,multiple breasts,cloned face,gross proportions, mutated hands,bad hands,bad feet,long neck,missing limb,malformed limbs,malformed hands,fused fingers,too many fingers,extra fingers,missing fingers,extra digit,fewer digits,mutated hands and fingers,lowres,text,error,cropped,worst quality,low quality,normal quality,jpeg artifacts,signature,watermark,username,blurry,text font ui, ' + data.field.uc
+                        break;
+                    case 'r18':
+                        data.field.uc = 'nsfw, lowres, bad anatomy, bad hands, text, error, missing fingers, extra digit, fewer digits, cropped, worst quality, low quality, normal quality, jpeg artifacts, signature, watermark, username,ugly,duplicate,morbid,mutilated,tranny,trans,trannsexual,mutation,deformed,long neck,bad anatomy,bad proportions,extra Cleavage, arms,extra legs, disfigured,more than 2 nipples,malformed,mutated,hermaphrodite,out of frame,extra limbs,missing arms,missing legs,poorly drawn hands,poorty drawn face,mutation,poorly drawn,long body,multiple breasts,cloned face,gross proportions, mutated hands,bad hands,bad feet,long neck,missing limb,malformed limbs,malformed hands,fused fingers,too many fingers,extra fingers,missing fingers,extra digit,fewer digits,mutated hands and fingers,lowres,text,error,cropped,worst quality,low quality,normal quality,jpeg artifacts,signature,watermark,username,blurry,text font ui, ' + data.field.uc
+                        break;
+                    case 'nsfw':
+                        data.field.uc = 'nsfw, lowres, bad anatomy, bad hands, text, error, missing fingers, extra digit, fewer digits, cropped, worst quality, low quality, normal quality, jpeg artifacts, signature, watermark, username, blurry, bad feet, ' + data.field.uc
+                        break;
+                    case 'lowanderr':
+                        data.field.uc = 'lowres, bad anatomy, bad hands, text, error, missing fingers, extra digit, fewer digits, cropped, worst quality, low quality, normal quality, jpeg artifacts, signature, watermark, username, blurry, bad feet, ' + data.field.uc
+                        break;
+                    case 'low':
+                        data.field.uc = 'lowres, text, cropped, worst quality, low quality, normal quality, jpeg artifacts, signature, watermark, username, blurry, ' + data.field.uc
+                        break;
+                    case 'none':
+
+                        break;
+
+                    default:
+                        popup.failure("不要乱动页面元素");
+                        return false;
+                        break;
+                }
+
+
+                /// 按钮加载动画
+                var load = button.load({
+                    elem: '[lay-submit]'
+                });
+
+                /// 提交
+                $.ajax({
+                    url: './ajax.php?act=freegenerate',
+                    type: "POST",
+                    timeout: "10000",
+                    data: data.field,
+                    success: function (data) {
+                        load.stop();
+                        gtobj.reset();
+                        if (data.code == 200) {
+                            popup.success(data.msg);
+                            var tid = data.tid;
+                            $('#procdiv').removeClass('layui-hide');
+                            var gettask = function (index) {
+                                $.ajax({
+                                    type: 'GET',
+                                    url: "/ajax.php?act=freetask&tid=" + tid,
+                                    crossDomain: true,
+                                    success: function (res) {
+                                        if (res.data.status == 'success') {
+                                            records.push(res.data);
+                                            localStorage.setItem('lbwnb', JSON.stringify(records));
+                                            renderrecord(records);
+                                            layer.closeAll();
+                                            if(res.data.nsfw) popup.failure('检测到NSFW图片');
+                                            else popup.success('生成成功');
+                                        } else if (res.data.status == 'fail') {
+                                            layer.closeAll();
+                                            popup.failure('生成失败');
+                                            setTimeout(function () {
+                                                gettask(index);
+                                            }, 1000);
+                                        } else if (res.data.status == 'waiting') {
+                                            if(res.count > 0){
+                                                layer.title('您前面还有' + res.count + '人', index);
+                                            }else{
+                                                layer.title('正在处理中', index);
+                                            }
+                                            
+                                            setTimeout(function () {
+                                                gettask(index);
+                                            }, 1000);
+                                        } else {
+                                            setTimeout(function () {
+                                                gettask(index);
+                                            }, 1000);
+                                        }
+                                    },
+                                    error: function (XMLResponse) {
+                                        popup.failure('获取任务过程中遇到错误：' + XMLResponse.responseText);
+                                    }
+                                });
+                            }
+                            layer.open({
+                                type: 1,
+                                closeBtn: 0,
+                                title: '处理中',
+                                content: '<div style="padding:20px;">正在处理中，请稍后。。。</div>',
+                                success: function (layero, index) {
+                                    gettask(index);
+                                }
+                            });
+                        } else {
+                            popup.failure(data.msg);
+                        }
+                    },
+                    error: function (XMLResponse) {
+                        load.stop();
+                        popup.failure("提交异常");
+                    }
+                });
+
+                return false;
+            });
+
+            $('#defaulttag').click(function () {
+                $('[name="desc"]').val("masterpiece,best quality,official art,extremely detailed CG unity 8k wallpaper, ");
+            });
+
+            $('[type="reset"]').click(function () {
+                $('[name="desc"]').val('');
+                $('[name="uc"]').val('');
+                $('[name="steps"]').val('28');
+                $('[name="scale"]').val('11');
+                $('[name="seed"]').val('');
+            })
+
+            $('#savetag').click(function () {
+                localStorage.setItem("tag1", $('[name="desc"]').val());
+                popup.success("正向tag已保存！")
+            });
+
+            form.on('select(sampler)', function (data) {
+                var that = data.othis;
+                layer.tips('不同的采样方法可以在相同的提示下以不同的步长值创建不同的结果<br>有些可能会创建非常相似的图像，而有些则不会', that, {
+                    tips: [1, '#2d8cf0']
+                });
+            });
+
+            $('[name="steps"]').focus(function () {
+                var that = this;
+                layer.tips('步数越多细节越多', that, {
+                    tips: [1, '#2d8cf0']
+                });
+            });
+
+            $('[name="scale"]').focus(function () {
+                var that = this;
+                layer.tips('Scale值表示 AI 将对您的提示做出多少响应<br>较大的值可以帮助 AI 更贴近文本提示的整体意图，但设置得太高，可能会产生不利影响', that, {
+                    tips: [1, '#2d8cf0']
+                });
+            });
+
+            $('[name="seed"]').focus(function () {
+                var that = this;
+                layer.tips('种子是 AI 用来计算您的特定图像的确切方式 每个随机生成都有一个唯一的种子', that, {
+                    tips: [1, '#2d8cf0']
+                });
+            });
+
+            //绑定清除历史记录
+            $('#clear').click(function () {
+
+                layer.open({
+                    icon: 3,
+                    title: '提示',
+                    content: '您想从服务器删除已生成的图片吗？',
+                    btn: ['从服务器删除', '仅删除本地记录', '取消'],
+                    yes: function (index, layero) {
+                        $.ajax({
+                            type: 'GET',
+                            url: "./ajax.php?act=clear",
+                            crossDomain: true,
+                            success: function (res) {
+                                if (res.code == 200) {
+                                    popup.success(res.msg);
+                                    console.log(res);
+                                } else {
+                                    popup.failure(res.msg);
+                                }
+                            },
+                            error: function (XMLResponse) {
+                                popup.failure('提交过程中遇到错误：' + XMLResponse.responseText);
+                            }
+                        });
+                        var records = [];
+                        window.records = [];
+                        localStorage.setItem('lbwnb', JSON.stringify(records));
+                        renderrecord(records)
+                        layer.close(index);
+                        location.reload()
+                    },
+                    btn2: function (index, layero) {
+                        var records = [];
+                        window.records = [];
+                        localStorage.setItem('lbwnb', JSON.stringify(records));
+                        renderrecord(records)
+                        layer.close(index);
+                    },
+                });
+            });
+
+            $('#getlist').click(function () {
+                layer.confirm('<span class="layui-font-red">此操作将尝试从服务器获取本IP曾经生成的图片</span>', {
+                    title: '提示'
+                }, function (index) {
+                    loading.Load(3, "");
+                    $.ajax({
+                        type: 'GET',
+                        url: "./ajax.php?act=getlist",
+                        crossDomain: true,
+                        success: function (res) {
+                            loading.loadRemove(1000);
+                            if (res.code == 200) {
+                                popup.success(res.msg);
+                                localStorage.setItem('lbwnb', JSON.stringify(res.data));
+                                renderrecord(records)
+                            } else {
+                                popup.failure(res.msg);
+                            }
+                        },
+                        error: function (XMLResponse) {
+                            popup.failure('提交过程中遇到错误：' + XMLResponse.responseText);
+
+                            loading.loadRemove(1000);
+                        }
+                    });
+                    layer.close(index);
+                });
+            });
+
+
+            $('#notice').click(function () {
+                layer.alert('如果提示检测到NSFW，很可能是您生成的图片穿着过于暴露，建议在提示词描述下人物的穿着', {
+                    btn: ['知道了', '查看更多', '取消'],
+                    btn2: function () {
+                        location.href = '/faq.html'
+                    }
+                })
+            })
+
+
+            if (!isJSON(localStorage.getItem('lbwnb'))) {
+                var records = [];
+                localStorage.setItem('lbwnb', JSON.stringify(records));
+            }
+            var records = JSON.parse(localStorage.getItem('lbwnb'));
+            if (records == [] && records) {
+                $('#history').html('暂无数据')
+            } else {
+                renderrecord(records)
+            }
+
+            $('#history').on('click', ".history-div", function () {
+                layer.photos({
+                    photos: '#history'
+                });
+            });
+        });
+    </script>
+    <script>
+        layui.use(['tac', 'form', 'layer'], function () {
+            var $ = layui.jquery,
+                layer = layui.layer,
+                form = layui.form;
+
+            form.on('submit(tac)', function (data) {
+                var config = {
+                    "tac_active": (data.field.tac_active ? 'on' : 'off'),
+                    "tac_theme": (data.field.tac_theme ? 'on' : 'off'),
+                    "tac_maxResults": data.field.tac_maxResults,
+                    "tac_delayTime": data.field.tac_delayTime,
+                    "tac_showAllResults": (data.field.tac_showAllResults ? 'on' : 'off')
+                }
+                for (var key in config) {
+                    if (Object.hasOwnProperty.call(config, key)) {
+                        layui.data('tac_config', {
+                            key: key,
+                            value: config[key]
+                        });
+                    }
+                }
+                layer.msg('保存成功', function () {
+                    location.reload();
+                });
+            });
+
+            config = layui.data('config');
+            if (config.music == 'off') $('#musicopt').prop("checked", false);
+            form.on('switch(music)', function (data) {
+                layui.data('config', {
+                    key: 'music',
+                    value: (data.elem.checked == true ? 'on' : 'off')
+                });
+                layer.msg('保存成功');
+            });
+            if (config.kefu == 'off') $('#kefuopt').prop("checked", false);
+            form.on('switch(kefu)', function (data) {
+                layui.data('config', {
+                    key: 'kefu',
+                    value: (data.elem.checked == true ? 'on' : 'off')
+                });
+                layer.msg('保存成功');
+            });
+
+            tac_config = layui.data('tac_config');
+            $('[name="tac_active"]').prop("checked", tac_config.tac_active == 'off' ? false : true);
+            $('[name="tac_showAllResults"]').prop("checked", tac_config.tac_showAllResults == 'on' ? true : false);
+            $('[name="tac_maxResults"]').val(tac_config.tac_maxResults > 0 ? tac_config.tac_maxResults : 5);
+            $('[name="tac_delayTime"]').val(tac_config.tac_delayTime > 0 ? tac_config.tac_delayTime : 100);
+            $('[name="tac_theme"]').prop("checked", tac_config.tac_theme == 'on' ? true : false);
+            form.render('checkbox');
+
+            window.opts = {
+                "tac_tagFile": "danbooru.csv",
+                "tac_active": tac_config.tac_active == 'off' ? false : true,
+                "tac_theme": tac_config.tac_theme == 'on' ? 0 : 1,
+                "tac_maxResults": tac_config.tac_maxResults > 0 ? tac_config.tac_maxResults : 5,
+                "tac_showAllResults": tac_config.tac_active == 'on' ? true : false,
+                "tac_resultStepLength": 100,
+                "tac_delayTime": tac_config.tac_delayTime > 0 ? tac_config.tac_delayTime : 100,
+                "tac_useWildcards": true,
+                "tac_useEmbeddings": true,
+                "tac_replaceUnderscores": true,
+                "tac_escapeParentheses": true,
+                "tac_appendComma": true,
+                "tac_alias.searchByAlias": true,
+                "tac_alias.onlyShowAlias": false,
+                "tac_translation.translationFile": "zhcn.csv",
+                "tac_translation.oldFormat": false,
+                "tac_translation.searchByTranslation": true,
+                "tac_extra.extraFile": "None",
+                "tac_extra.onlyAliasExtraFile": false
+            }
+
+            $(function () {
+                layui.tac.render();
+            });
+
+            var config = layui.data('config');
+            console.log(config)
+            if (config.music != 'off') {
+                var oScript = document.createElement("script");
+                oScript.src = "https://myhkw.cn/api/player/159858315387";
+                oScript.type = "text/javascript";
+                oScript.id = "myhk";
+                oScript.setAttribute('key', "159858315387");
+                oScript.setAttribute('m', '1');
+                $('head').append(oScript);
+            }
+
+            if (config.music != 'off') {
+                var Tawk_API = Tawk_API || {};
+                Tawk_API.visitor = layui.device();
+                var Tawk_LoadStart = new Date();
+                (function () {
+                    var s1 = document.createElement("script"), s0 = document.getElementsByTagName("script")[0];
+                    s1.async = true;
+                    s1.src = 'https://embed.tawk.to/63899ca0b0d6371309d23d4f/1gj8onlvl';
+                    s1.charset = 'UTF-8';
+                    s1.setAttribute('crossorigin', '*');
+                    s0.parentNode.insertBefore(s1, s0);
+                })();
+            }
+
+
+        })
+    </script>
+    <script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+    <script>LA.init({ id: "JrpB1buRIBfYJWxk", ck: "JrpB1buRIBfYJWxk" })</script>
+    <script>
+        layer.alert('欢迎使用8资源网AI绘画！<br>本站架设于国外，国内访问如果过慢，请使用科学上网！<br><a class="layui-font-red" href="https://fanqiev2.work/auth/register?code=xj5Y" target="_blank"><b>▶机场推荐：番茄.V2航线◀</b></a><br><br><span class="layui-font-red">2022/12/24 服务器迁移到国内啦~<br>2022/12/14 免费生成移到QQ群内<br>2022/12/10 开放图片放大功能，每分钟可放大三次！<br><b>有经济条件的魔法师欢迎赞助我们，可以在菜单找到发卡网，您的支持是我维护下去的动力！</b></span>', { title: '温馨提示', btn: ['加入交流群', '我知道了'] }, function (index) { window.open('https://jq.qq.com/?_wv=1027&k=zhDzYmZv', '_blank'); layer.close(index); });
+    </script>
+</body>
+
+</html>
